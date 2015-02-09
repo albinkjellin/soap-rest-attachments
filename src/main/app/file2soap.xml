@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.6.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+
+	<http:request-config name="SOAP-Service" host="localhost"
+		port="8883" doc:name="HTTP Request Configuration" />
+	<flow name="file2soap" doc:description="Reads a file and sends that as a SOAP attachment to a SOAP service.">
+		<file:inbound-endpoint
+			path="/Users/albin/dev/mulesoft/studio/projects/3.6.0/soap-rest-attachments/src/test/resources/soap/attachment/in"
+			responseTimeout="10000" doc:name="Read File" />
+			
+		<processor-chain doc:name="Processor Chain">
+		
+			<scripting:transformer doc:name="Create SOAP Attachement">
+				<scripting:script engine="Groovy"><![CDATA[def attachment = new org.apache.cxf.attachment.AttachmentImpl(originalFilename)
+def source = new org.apache.axiom.attachments.ByteArrayDataSource(payload.getBytes(),'application/pdf');
+attachment.setDataHandler(new org.apache.axiom.attachments.ConfigurableDataHandler(source));
+message.setInvocationProperty('cxf_attachments',[attachment])
+return payload
+]]></scripting:script>
+			</scripting:transformer>
+ 
+			<set-payload value="#[['FirstName', 'LastName', '123'].toArray()]"
+				doc:name="Create Payload Map" />
+
+			<cxf:jaxws-client operation="contact"
+				serviceClass="org.mule.demo.soap.Contact" doc:name="SOAP Client">
+
+				<cxf:outInterceptors>
+					<spring:bean
+						class="org.mule.module.cxf.support.CopyAttachmentOutInterceptor" />
+				</cxf:outInterceptors>
+
+			</cxf:jaxws-client>
+			<http:request config-ref="SOAP-Service" path="contacts"
+				method="POST" doc:name="Call SOAP Service" />
+
+		</processor-chain>
+	</flow>
+</mule>

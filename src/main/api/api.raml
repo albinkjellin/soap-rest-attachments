@@ -1,0 +1,43 @@
+#%RAML 0.8
+title: rest-attachment
+version: 1.0.0
+/contact:
+  get:
+    description: Get a list of contacts.
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "firstname":"Albin",
+                "lastname":"Kjellin",
+                "ssn":"123456789"
+              }
+  post:
+    description: Create a contact
+    body:
+      application/json:
+        example: |
+          [
+            {
+              "firstname":"Albin",
+              "lastname":"Kjellin",
+              "ssn":"123456789"
+            }
+          ]
+  /{contactId}:
+    /datasheet:
+      description: Upload the pdf version of the admissions form.
+      post:
+        body:
+          multipart/form-data:
+        responses:
+          200:
+            body:
+              application/json:
+                example: |
+                 {
+                   "status":"success"
+                  }
+      

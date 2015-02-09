@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.6.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+	<http:listener-config name="SOAP-in" host="0.0.0.0"
+		port="8883" doc:name="HTTP Listener Configuration" />
+
+	<flow name="soap2file">
+
+		<http:listener config-ref="SOAP-in" path="/contacts"
+			doc:name="Receive SOAP Request" parseRequest="false" />
+		<cxf:jaxws-service serviceClass="org.mule.demo.soap.Contact"
+			doc:name="Parse SOAP Request">
+			<cxf:inInterceptors>
+				<spring:bean
+					class="org.mule.module.cxf.support.CopyAttachmentInInterceptor" />
+			</cxf:inInterceptors>
+		</cxf:jaxws-service>
+        
+		<choice doc:name="Choice">
+			<when expression="#[flowVars.containsKey('cxf_attachments')]">
+
+				<set-payload
+					value="#[cxf_attachments.iterator().next().getDataHandler().getContent()]"
+					doc:name="Retrive Attachment" />
+
+				<file:outbound-endpoint
+					path="/Users/albin/dev/mulesoft/studio/projects/3.6.0/soap-rest-attachments/src/test/resources/soap/attachment/out"
+					outputPattern="#[server.dateTime.toString()].pdf" responseTimeout="10000"
+					doc:name="Write File to Disc" />
+			</when>
+			<otherwise>
+				<logger
+					message="********************** No SOAP Attachement Found! **********************"
+					level="INFO" doc:name="Log Missing Attachment" />
+			</otherwise>
+		</choice>
+
+		<set-payload value="Success" doc:name="Generate Response" />
+	</flow>
+ 
+</mule>
