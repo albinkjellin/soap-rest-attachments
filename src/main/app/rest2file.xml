@@ -38,7 +38,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
         <set-payload value="#[message.inboundAttachments]" doc:name="Retrieve Attachments"/>
         <foreach doc:name="For Each">
             <set-payload value="#[payload.getInputStream() ]" doc:name="Get Inputstream from Payload"/>
-            <file:outbound-endpoint path="/Users/albin/dev/mulesoft/studio/projects/3.6.0/soap-rest-attachments/src/test/resources/rest/attachment/out" responseTimeout="10000" doc:name="File" outputPattern="#[server.dateTime.toString()].pdf"/>
+            <file:outbound-endpoint path="src/test/resources/rest/attachment/out" responseTimeout="10000" doc:name="File" outputPattern="#[server.dateTime.toString()].pdf"/>
         </foreach>
 		<set-payload value="{&quot;status&quot;:&quot;success&quot;}"
 			doc:name="Generate JSON Response" />

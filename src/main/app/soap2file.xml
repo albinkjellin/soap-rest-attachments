@@ -35,7 +35,7 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 					doc:name="Retrive Attachment" />
 
 				<file:outbound-endpoint
-					path="/Users/albin/dev/mulesoft/studio/projects/3.6.0/soap-rest-attachments/src/test/resources/soap/attachment/out"
+					path="src/test/resources/soap/attachment/out"
 					outputPattern="#[server.dateTime.toString()].pdf" responseTimeout="10000"
 					doc:name="Write File to Disc" />
 			</when>
