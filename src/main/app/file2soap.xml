@@ -18,7 +18,7 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 		port="8883" doc:name="HTTP Request Configuration" />
 	<flow name="file2soap" doc:description="Reads a file and sends that as a SOAP attachment to a SOAP service.">
 		<file:inbound-endpoint
-			path="/Users/albin/dev/mulesoft/studio/projects/3.6.0/soap-rest-attachments/src/test/resources/soap/attachment/in"
+			path="src/test/resources/soap/attachment/in"
 			responseTimeout="10000" doc:name="Read File" />
 			
 		<processor-chain doc:name="Processor Chain">

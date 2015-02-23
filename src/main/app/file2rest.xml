@@ -10,7 +10,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
     <http:request-config name="HTTP_Request_Configuration" host="localhost" basePath="api" port="8884" doc:name="HTTP Request Configuration"/>
     <flow name="file2rest" doc:description="Reads a file from your desktop and sends that to a rest service.">
-        <file:inbound-endpoint path="/Users/albin/dev/mulesoft/studio/projects/3.6.0/soap-rest-attachments/src/test/resources/rest/attachment/in" responseTimeout="10000" doc:name="File"/>
+        <file:inbound-endpoint path="src/test/resources/rest/attachment/in" responseTimeout="10000" doc:name="File"/>
         <file:file-to-byte-array-transformer doc:name="File to Byte Array"/>
         <set-attachment attachmentName="#[originalFilename]" value="#[payload]" contentType="multipart/form-data" doc:name="Attachment"/>
         <http:request config-ref="HTTP_Request_Configuration" path="contact/abc/datasheet" method="POST" doc:name="HTTP" parseResponse="false"/>
